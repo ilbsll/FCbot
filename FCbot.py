@@ -95,7 +95,7 @@ def main():
             message.mark_as_read()
 
 logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
-r = praw.Reddit(user_agent='FC agent test', site_name='FCbot')
+r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
 if __name__ == '__main__':

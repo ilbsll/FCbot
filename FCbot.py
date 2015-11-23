@@ -93,7 +93,6 @@ def process_message(message):
                 response_text = response_text[:9900] + '...'
                 break
         response_text += '#Total Score: {0}'.format(str(total_score))
-        response_text += '\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.'
         reply_with_sig(message, response_text)
         return True
     except praw.errors.HTTPException:

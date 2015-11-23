@@ -99,7 +99,7 @@ logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
-username_regex = re.compile(r'^(/?u/{0})?\s*(?P<ulink>/?u/)?(?P<username>[-\w]{3, 20})\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
+username_regex = re.compile(r'^(/?u/{0})?\s*(?P<ulink>/?u/)?(?P<username>[-\w]{{3, 20}})\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
 if __name__ == '__main__':
     try:
         main()

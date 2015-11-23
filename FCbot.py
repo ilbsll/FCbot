@@ -59,8 +59,12 @@ def process_message(message):
             reactionary_comments = user_results[1]
             reactionary_submissions = user_results[2]
         except praw.errors.NotFound:
+            message.reply('User {0} not found.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.'.format(username))
             return True
         total_score = 0
+        if not reactionary_scores:
+            message.reply('No participation in reactionary subreddits found for {0}.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.'.format(username))
+            return True
         response_text = "{0}'s post history contains participation in the following reactionary subreddits:\n\n".format(user.name)
         for subreddit in reactionary_scores:
             total_score += reactionary_scores[subreddit]

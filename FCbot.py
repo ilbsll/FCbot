@@ -37,7 +37,9 @@ def get_username(messagetxt):
     match = username_regex.match(messagetxt)
     if match.group('ulink'):
         return 'U'
-    return match.group('username')
+    if match:
+        return match.group('username')
+    return None
 
 
 def process_message(message):

@@ -84,6 +84,7 @@ def process_message(message):
         return False
     except praw.errors.APIException:
         logging.exception()
+        return False
 
 
 def main():

@@ -42,6 +42,11 @@ def get_username(messagetxt):
     return None
 
 
+def reply_with_sig(message, response):
+    signature = '\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.'
+    message.reply(response + signature)
+
+
 def process_message(message):
     try:
         if message.subreddit.display_name.lower() not in opt_in_subs:
@@ -50,10 +55,10 @@ def process_message(message):
         if not username:
             return True
         if username == 'U':
-            message.reply('Please do not use /u/ links when naming the user you wish me to search.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.')
+            reply_with_sig(message, 'Please do not use /u/ links when naming the user you wish me to search.')
             return True
         if username.lower() == bot_name.lower():
-            message.reply('Nah.')
+            reply_with_sig(message, 'Nah.')
             return True
         user = r.get_redditor(username)
         try:
@@ -62,11 +67,11 @@ def process_message(message):
             reactionary_comments = user_results[1]
             reactionary_submissions = user_results[2]
         except praw.errors.NotFound:
-            message.reply('User {0} not found.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.'.format(username))
+            reply_with_sig(message, 'User {0} not found.'.format(username))
             return True
         total_score = 0
         if not reactionary_scores:
-            message.reply('No participation in reactionary subreddits found for {0}.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.'.format(username))
+            reply_with_sig(message, 'No participation in reactionary subreddits found for {0}.'.format(username))
             return True
         response_text = "{0}'s post history contains participation in the following reactionary subreddits:\n\n".format(user.name)
         for subreddit in reactionary_scores:
@@ -89,7 +94,7 @@ def process_message(message):
                 break
         response_text += '#Total Score: {0}'.format(str(total_score))
         response_text += '\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.'
-        message.reply(response_text)
+        reply_with_sig(message, response_text)
         return True
     except praw.errors.HTTPException:
         return False

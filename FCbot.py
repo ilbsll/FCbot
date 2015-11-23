@@ -1,6 +1,7 @@
 import logging
 import praw
 import random
+import re
 from FCsettings import opt_in_subs, reactionary_subreddits
 
 
@@ -33,22 +34,23 @@ def search_history(user):
 
 
 def get_username(messagetxt):
-    username = ''
-    for letter in messagetxt[messagetxt.find('u/' + bot_name) + len(bot_name) + 3:]:
-        if not (letter.isalpha() or letter.isnum() or letter == '_'):
-            break
-        username += letter
-    return username
+    match = username_regex.match(messagetxt)
+    if match.group('ulink'):
+        return 'U'
+    return match.group('username')
 
 
 def process_message(message):
     try:
         if message.subreddit.display_name.lower() not in opt_in_subs:
             return True
-        user = r.get_redditor(get_username(message.body))
-        if 'u/' in user.name:
-            message.reply('Please do not use /u/ links when naming the user you wish to check.\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.')
+        username = get_username(message.body)
+        if username == 'U':
+            message.reply('Please do not use /u/ links when naming the user you wish me to search.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.')
             return True
+        if username.lower() == bot_name.lower():
+            return True
+        user = r.get_redditor(username)
         try:
             user_results = search_history(user)
             reactionary_scores = user_results[0]
@@ -97,6 +99,7 @@ logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
+username_regex = re.compile(r'^(/?u/{0})?\s*(?P<ulink>/?u/)?(?P<username>[-\w]{3, 20})\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
 if __name__ == '__main__':
     try:
         main()

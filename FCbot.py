@@ -35,9 +35,9 @@ def search_history(user):
 
 def get_username(messagetxt):
     match = username_regex.match(messagetxt)
-    if match.group('ulink'):
-        return 'U'
     if match:
+        if match.group('ulink'):
+            return 'U'
         return match.group('username')
     return None
 
@@ -53,6 +53,7 @@ def process_message(message):
             message.reply('Please do not use /u/ links when naming the user you wish me to search.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.')
             return True
         if username.lower() == bot_name.lower():
+            message.reply('Nah.')
             return True
         user = r.get_redditor(username)
         try:
@@ -109,7 +110,7 @@ logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
-username_regex = re.compile(r'^(/?u/{0})?\s*(?P<ulink>/?u/)?(?P<username>[-\w]+)\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
+username_regex = re.compile(r'^(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
 if __name__ == '__main__':
     try:
         main()

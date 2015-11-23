@@ -45,6 +45,8 @@ def process_message(message):
         if message.subreddit.display_name.lower() not in opt_in_subs:
             return True
         username = get_username(message.body)
+        if not username:
+            return True
         if username == 'U':
             message.reply('Please do not use /u/ links when naming the user you wish me to search.\n\n---\n\nI am a bot.Only the last 1,000 comment and submissions are searched.')
             return True

@@ -35,7 +35,7 @@ def search_history(user):
 def get_username(messagetxt):
     username = ''
     for letter in messagetxt[messagetxt.find('u/' + bot_name) + len(bot_name) + 3:]:
-        if letter.isspace():
+        if not (letter.isalpha() or letter.isnum() or letter == '_'):
             break
         username += letter
     return username
@@ -46,8 +46,6 @@ def process_message(message):
         if message.subreddit.display_name.lower() not in opt_in_subs:
             return True
         user = r.get_redditor(get_username(message.body))
-        if not user.name:
-            return True
         if 'u/' in user.name:
             message.reply('Please do not use /u/ links when naming the user you wish to check.\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.')
             return True
@@ -57,7 +55,6 @@ def process_message(message):
             reactionary_comments = user_results[1]
             reactionary_submissions = user_results[2]
         except praw.errors.NotFound:
-            message.reply('User {0} not found.\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.'.format(user.name))
             return True
         total_score = 0
         response_text = "{0}'s post history contains participation in the following reactionary subreddits:\n\n".format(user.name)
@@ -84,7 +81,7 @@ def process_message(message):
     except praw.errors.HTTPException:
         return False
     except praw.errors.APIException:
-        logging.exception()
+        logging.exception('Exception: ')
         return False
 
 
@@ -104,4 +101,4 @@ if __name__ == '__main__':
     try:
         main()
     except:
-        logging.exception()
+        logging.exception('Exception: ')

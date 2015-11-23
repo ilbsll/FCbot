@@ -49,7 +49,7 @@ def process_message(message):
         if not user.name:
             return True
         if 'u/' in user.name:
-            message.reply('Please do not use /u/ links when naming the user you wish to check.')
+            message.reply('Please do not use /u/ links when naming the user you wish to check.\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.')
             return True
         try:
             user_results = search_history(user)
@@ -57,7 +57,7 @@ def process_message(message):
             reactionary_comments = user_results[1]
             reactionary_submissions = user_results[2]
         except praw.errors.NotFound:
-            message.reply('User {0} not found.'.format(user.name))
+            message.reply('User {0} not found.\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.'.format(user.name))
             return True
         total_score = 0
         response_text = "{0}'s post history contains participation in the following reactionary subreddits:\n\n".format(user.name)

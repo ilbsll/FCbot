@@ -72,7 +72,8 @@ def process_message(message):
             response_text += '**{0}: {1} comment{4}, {2} submission{5}. Total score: {3}**  '.format(subreddit, num_comments,
                              num_submissions, reactionary_scores[subreddit], '' if num_comments == 1 else 's',
                              '' if num_submissions == 1 else 's')
-            response_text += '\nSample comment:  \n>{0}\n\n'.format(r.get_info(thing_id=random.choice(reactionary_comments[subreddit])).body.replace('\n\n', '\n\n>'))
+            if num_comments > 0:
+                response_text += '\nSample comment:  \n>{0}\n\n'.format(r.get_info(thing_id=random.choice(reactionary_comments[subreddit])).body.replace('\n\n', '\n\n>'))
             if len(response_text) > 9900:
                 response_text = response_text[:9900] + '...'
                 break

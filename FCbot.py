@@ -81,6 +81,8 @@ def process_message(message):
                              '' if num_submissions == 1 else 's')
             if num_comments > 0:
                 response_text += '\nSample comment:  \n>{0}\n\n'.format(r.get_info(thing_id=random.choice(reactionary_comments[subreddit])).body.replace('\n\n', '\n\n>'))
+            else:
+                response_text += '\n\n'
             if len(response_text) > 9900:
                 response_text = response_text[:9900] + '...'
                 break

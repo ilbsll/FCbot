@@ -111,6 +111,11 @@ def main():
             continue
         if process_message(message):
             message.mark_as_read()
+    for message in r.get_messages(limit=1000):
+        if message not in unread:
+            continue
+        if process_message(message):
+            message.mark_as_read()
 
 logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')

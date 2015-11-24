@@ -49,7 +49,7 @@ def reply_with_sig(message, response):
 
 def process_message(message):
     try:
-        if message.subreddit.display_name.lower() not in opt_in_subs:
+        if message.subreddit is not None and message.subreddit.display_name.lower() not in opt_in_subs:
             return True
         username = get_username(message.body)
         if not username:

@@ -105,14 +105,13 @@ def process_message(message):
 
 
 def main():
-    unread = list(r.get_unread(limit=1000))
     for message in r.get_mentions(limit=1000):
-        if message not in unread:
+        if not message.new:
             continue
         if process_message(message):
             message.mark_as_read()
     for message in r.get_messages(limit=1000):
-        if message not in unread:
+        if not message.new:
             continue
         if process_message(message):
             message.mark_as_read()

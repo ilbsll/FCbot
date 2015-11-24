@@ -51,7 +51,7 @@ def process_message(message):
     try:
         if message.subreddit is not None and message.subreddit.display_name.lower() not in opt_in_subs:
             return True
-        username = get_username(message.body, True if message.subreddit is None else False)
+        username = get_username(message.body, message.subreddit is None)
         if not username:
             return True
         if username == 'U':

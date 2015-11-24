@@ -33,10 +33,10 @@ def search_history(user):
     return reactionary_scores, reactionary_comments, reactionary_submissions
 
 
-def get_username(messagetxt):
+def get_username(messagetxt, is_pm):
     match = username_regex.match(messagetxt)
     if match:
-        if match.group('ulink'):
+        if match.group('ulink') and not is_pm:
             return 'U'
         return match.group('username')
     return None
@@ -51,7 +51,7 @@ def process_message(message):
     try:
         if message.subreddit is not None and message.subreddit.display_name.lower() not in opt_in_subs:
             return True
-        username = get_username(message.body)
+        username = get_username(message.body, True if message.subreddit is None else False)
         if not username:
             return True
         if username == 'U':

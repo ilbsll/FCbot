@@ -43,7 +43,7 @@ def get_username(messagetxt):
 
 
 def reply_with_sig(message, response):
-    signature = '\n\n---\n\nI am a bot. Only the last 1,000 comment and submissions are searched.'
+    signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
     message.reply(response + signature)
 
 

@@ -60,6 +60,8 @@ def process_message(message):
         if username.lower() == bot_name.lower():
             reply_with_sig(message, 'Nah.')
             return True
+        if username.lower() == 'me':
+            username = message.author.name
         user = r.get_redditor(username)
         try:
             user_results = search_history(user)

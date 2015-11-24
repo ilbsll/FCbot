@@ -1,6 +1,7 @@
 opt_in_subs = [
     'fullcommunism',
     'gulag',
+    'marxistpalestine',
     'shitliberalssay',
     'triplanetarytest'
 ]

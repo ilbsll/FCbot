@@ -34,7 +34,7 @@ def search_history(user):
 
 
 def get_username(messagetxt, is_pm):
-    match = username_regex.match(messagetxt)
+    match = username_regex.search(messagetxt)
     if match:
         if match.group('ulink') and not is_pm:
             return 'U'
@@ -116,7 +116,7 @@ logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
-username_regex = re.compile(r'.*^\s*(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE | re.DOTALL)
+username_regex = re.compile(r'^\s*(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
 if __name__ == '__main__':
     try:
         main()

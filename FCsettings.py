@@ -32,7 +32,6 @@ reactionary_subreddits = [
     'conspiracy',
     'coontown',
     'cringeanarchy',
-    'cringepics',
     'darkenlightenment',
     'detoilet',
     'didntdonuffins',

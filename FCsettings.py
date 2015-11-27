@@ -3,6 +3,7 @@ opt_in_subs = [
     'gulag',
     'marxistpalestine',
     'shitliberalssay',
+    'socialism',
     'triplanetarytest'
 ]
 

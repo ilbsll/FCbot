@@ -105,10 +105,10 @@ def process_message(message):
 
 
 def main():
-    for message in r.get_mentions(limit=1000):
+    for message in r.get_mentions(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-    for message in r.get_messages(limit=1000):
+    for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
 

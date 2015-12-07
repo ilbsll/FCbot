@@ -2,7 +2,8 @@ import logging
 import praw
 import random
 import re
-from FCsettings import opt_in_subs, reactionary_subreddits
+import sqlite3
+from FCsettings import useragent, opt_in_subs, reactionary_subreddits
 
 
 def search_history(user):
@@ -48,10 +49,13 @@ def reply_with_sig(message, response):
 
 
 def process_message(message):
+    global highest_score
+    global lowest_score
     try:
-        if message.subreddit is not None and message.subreddit.display_name.lower() not in opt_in_subs:
+        is_pm = message.subreddit is None
+        if not is_pm and message.subreddit.display_name.lower() not in opt_in_subs:
             return True
-        username = get_username(message.body, message.subreddit is None)
+        username = get_username(message.body, is_pm)
         if not username:
             return True
         if username == 'U':
@@ -71,6 +75,9 @@ def process_message(message):
         except praw.errors.NotFound:
             reply_with_sig(message, 'User {0} not found.'.format(username))
             return True
+        if not is_pm:
+            for sub in reactionary_scores:
+                c.execute('UPDATE subs SET count=count+1 WHERE name=?', (sub,))
         total_score = 0
         if not reactionary_scores:
             reply_with_sig(message, 'No participation in reactionary subreddits found for {0}.'.format(username))
@@ -96,11 +103,20 @@ def process_message(message):
                 break
         response_text += '#Total Score: {0}'.format(str(total_score))
         reply_with_sig(message, response_text)
+        if not is_pm:
+            if total_score > highest_score:
+                highest_score = total_score
+                c.execute('REPLACE INTO users VALUES "highest", ?, ?', (username, total_score))
+            if total_score < lowest_score:
+                lowest_score = total_score
+                c.execute('REPLACE INTO users VALUES "lowest", ?, ?', (username, total_score))
         return True
     except praw.errors.HTTPException:
+        db.rollback()
         return False
     except praw.errors.APIException:
         logging.exception('Exception: ')
+        db.rollback()
         return False
 
 
@@ -108,15 +124,24 @@ def main():
     for message in r.get_mentions(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
+            c.execute('UPDATE stats SET Number=Number+1 WHERE Statistic="totalsearches"')
+            db.commit()
     for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
+            c.execute('UPDATE stats SET Number=Number+1 WHERE Statistic="totalsearches"')
+            db.commit()
 
 logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
-r = praw.Reddit(user_agent='FULLCOMMUNISM reactionary sub peeksy-pie agent v1', site_name='FCbot')
+r = praw.Reddit(user_agent=useragent, site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
 username_regex = re.compile(r'^\s*(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
+db = sqlite3.connect('FCbot.db')
+c = db.cursor()
+highest_score = c.execute('SELECT score FROM users WHERE distinction="highest"').fetchone()[0]
+lowest_score = c.execute('SELECT score FROM users WHERE distinction="lowest"').fetchone()[0]
+
 if __name__ == '__main__':
     try:
         main()

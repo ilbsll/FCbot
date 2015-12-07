@@ -1,4 +1,6 @@
 /__pycache__/*
 /.idea/*
+/stats/*
+*db
 *.pyc
 *.log

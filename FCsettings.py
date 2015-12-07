@@ -1,3 +1,5 @@
+useragent = 'FULLCOMMUNISM reactionary sub peeksy-pie agent v2'
+
 opt_in_subs = [
     'communism',
     'fullcommunism',

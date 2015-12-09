@@ -106,10 +106,10 @@ def process_message(message):
         if not is_pm:
             if total_score > highest_score:
                 highest_score = total_score
-                c.execute('REPLACE INTO users VALUES "highest", ?, ?', (username, total_score))
+                c.execute('REPLACE INTO users VALUES ("highest", ?, ?)', (username, total_score))
             if total_score < lowest_score:
                 lowest_score = total_score
-                c.execute('REPLACE INTO users VALUES "lowest", ?, ?', (username, total_score))
+                c.execute('REPLACE INTO users VALUES ("lowest", ?, ?)', (username, total_score))
         return True
     except praw.errors.HTTPException:
         db.rollback()

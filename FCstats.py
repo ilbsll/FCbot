@@ -12,6 +12,10 @@ lowest_score = c.execute('SELECT user, score FROM users WHERE distinction="lowes
 sub_counts = c.execute('SELECT * FROM subs ORDER BY count DESC').fetchall()
 
 post_text = '''\
+**Overall Stats**
+
+
+
 **User Stats**
 
   | User | Score

@@ -7,8 +7,10 @@ from FCsettings import useragent, opt_in_subs, reactionary_subreddits
 
 
 def search_history(user):
-    reactionary_comments = {}
+    """Fetches the user's last 1000 comments and submissions and checks the subreddits for membership in the list.
+    Returns a tuple of three dicts, all three using the subreddit names as keys."""
     reactionary_scores = {}
+    reactionary_comments = {}
     reactionary_submissions = {}
     for comment in user.get_comments(limit=1000):
         sub_name = comment.subreddit.display_name.lower()
@@ -35,20 +37,26 @@ def search_history(user):
 
 
 def get_username(messagetxt, is_pm):
+    """Matches the pre-compiled regex statement against the body of the message. Returns one of three strings: a
+    username, the special case 'U' if the caller has used a /u/ link, or an empty string if the regex didn't match."""
     match = username_regex.search(messagetxt)
     if match:
         if match.group('ulink') and not is_pm:
             return 'U'
         return match.group('username')
-    return None
+    return ''
 
 
 def reply_with_sig(message, response):
+    """Appends the signature to the bot's post before posting it. Does not return a value."""
     signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
     message.reply(response + signature)
 
 
 def process_message(message):
+    """Generates a response post based on the results of get_username() and search_history(). Returns True if the
+    message should be marked as read, and thus not addressed again in the future, or False if the message could not
+    be processed but should be attempted again on the next pass."""
     global highest_score
     global lowest_score
     try:
@@ -121,6 +129,7 @@ def process_message(message):
 
 
 def main():
+    """Main is usually a function."""
     for message in r.get_mentions(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()

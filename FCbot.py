@@ -129,7 +129,6 @@ def main():
     for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-            c.execute('UPDATE stats SET Number=Number+1 WHERE Statistic="totalsearches"')
             db.commit()
 
 logging.basicConfig(level=logging.ERROR, filename='FCbot.log')

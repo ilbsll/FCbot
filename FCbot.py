@@ -1,9 +1,19 @@
+import fcntl
 import logging
 import praw
 import random
 import re
 import sqlite3
 from FCsettings import useragent, opt_in_subs, reactionary_subreddits
+
+
+def lock():
+    global fp
+    fp = open('FClock', 'w')
+    try:
+        fcntl.lockf(fp, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except IOError:
+        exit()
 
 
 def search_history(user):
@@ -147,6 +157,8 @@ def main():
             message.mark_as_read()
             db.commit()
 
+
+lock()
 logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent=useragent, site_name='FCbot')
 r.refresh_access_information()

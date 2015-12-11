@@ -7,8 +7,10 @@ from FCsettings import useragent, opt_in_subs, reactionary_subreddits
 
 
 def search_history(user):
-    """Fetches the user's last 1000 comments and submissions and checks the subreddits for membership in the list.
-    Returns a tuple of three dicts, all three using the subreddit names as keys."""
+    """Fetches the user's last 1000 comments and submissions and checks the
+    subreddits for membership in the list. Returns a tuple of three dicts, all
+    three using the subreddit names as keys.
+    """
     reactionary_scores = {}
     reactionary_comments = {}
     reactionary_submissions = {}
@@ -37,8 +39,11 @@ def search_history(user):
 
 
 def get_username(messagetxt, is_pm):
-    """Matches the pre-compiled regex statement against the body of the message. Returns one of three strings: a
-    username, the special case 'U' if the caller has used a /u/ link, or an empty string if the regex didn't match."""
+    """Matches the pre-compiled regex statement against the body of the
+    message. Returns one of three strings: a username, the special case 'U' if
+    the caller has used a /u/ link, or an empty string if the regex didn't
+    match.
+    """
     match = username_regex.search(messagetxt)
     if match:
         if match.group('ulink') and not is_pm:
@@ -54,9 +59,11 @@ def reply_with_sig(message, response):
 
 
 def process_message(message):
-    """Generates a response post based on the results of get_username() and search_history(). Returns True if the
-    message should be marked as read, and thus not addressed again in the future, or False if the message could not
-    be processed but should be attempted again on the next pass."""
+    """Generates a response post based on the results of get_username() and
+    search_history(). Returns True if the message should be marked as read, and
+    thus not addressed again in the future, or False if the message could not
+    be processed but should be attempted again on the next pass.
+    """
     global highest_score
     global lowest_score
     try:

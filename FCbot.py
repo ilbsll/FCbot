@@ -1,5 +1,4 @@
 import fcntl
-import logging
 import praw
 import random
 import re
@@ -140,7 +139,6 @@ def process_message(message):
         db.rollback()
         return False
     except praw.errors.APIException:
-        logging.exception('Exception: ')
         db.rollback()
         return False
 
@@ -159,7 +157,6 @@ def main():
 
 
 lock()
-logging.basicConfig(level=logging.ERROR, filename='FCbot.log')
 r = praw.Reddit(user_agent=useragent, site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
@@ -170,7 +167,4 @@ highest_score = c.execute('SELECT score FROM users WHERE distinction="highest"')
 lowest_score = c.execute('SELECT score FROM users WHERE distinction="lowest"').fetchone()[0]
 
 if __name__ == '__main__':
-    try:
-        main()
-    except:
-        logging.exception('Exception: ')
+    main()

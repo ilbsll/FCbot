@@ -150,9 +150,15 @@ def process_gulag_thread(thread):
     elif 'reddit.com/user/' in url:
         username = url[url.index('/user/') + 6:]
     elif re.match(is_comment, url):
-        username = r.get_submission(url).comments[0].author.name
+        comment = r.get_submission(url).comments[0]
+        if comment is None:
+            return
+        username = comment.author.name
     else:
-        username = r.get_submission(url).author.name
+        thread = r.get_submission(url)
+        if thread is None:
+            return
+        username = thread.author.name
     response_text = generate_response(username)
     signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
     thread.add_comment(response_text + signature)

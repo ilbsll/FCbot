@@ -2,7 +2,6 @@ import fcntl
 import praw
 import random
 import re
-import sqlite3
 from FCsettings import useragent, opt_in_subs, reactionary_subreddits
 
 
@@ -53,7 +52,8 @@ def get_username(messagetxt, is_pm):
     the caller has used a /u/ link, or an empty string if the regex didn't
     match.
     """
-    match = username_regex.search(messagetxt)
+    regex = r'^\s*(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name)
+    match = re.search(regex, messagetxt, flags=re.IGNORECASE | re.MULTILINE)
     if match:
         if match.group('ulink') and not is_pm:
             return 'U'
@@ -67,14 +67,45 @@ def reply_with_sig(message, response):
     message.reply(response + signature)
 
 
+def generate_response(username):
+    """Generates and returns a response based on the results of search_user()."""
+    user = r.get_redditor(username)
+    try:
+        user.refresh()
+    except praw.errors.NotFound:
+        return 'User {0} not found.'.format(username)
+    reactionary_scores, reactionary_comments, reactionary_submissions = search_history(user)
+    total_score = 0
+    if not reactionary_scores:
+        return 'No participation in reactionary subreddits found for {0}.'.format(user.name)
+    response_text = "{0}'s post history contains participation in the following reactionary subreddits:\n\n".format(user.name)
+    for subreddit in reactionary_scores:
+        total_score += reactionary_scores[subreddit]
+        num_comments = 0
+        num_submissions = 0
+        if subreddit in reactionary_comments:
+            num_comments = len(reactionary_comments[subreddit])
+        if subreddit in reactionary_submissions:
+            num_submissions = reactionary_submissions[subreddit]
+        response_text += '**{0}: {1} comment{4}, {2} submission{5}. Total score: {3}**  '.format(subreddit, num_comments,
+                         num_submissions, reactionary_scores[subreddit], '' if num_comments == 1 else 's',
+                         '' if num_submissions == 1 else 's')
+        if num_comments > 0:
+            response_text += '\nSample comment:  \n>{0}\n\n'.format(r.get_info(thing_id=random.choice(reactionary_comments[subreddit])).body.replace('\n\n', '\n\n>'))
+        else:
+            response_text += '\n\n'
+        if len(response_text) > 9900:
+            response_text = response_text[:9900] + '...'
+            break
+    response_text += '#Total Score: {0}'.format(str(total_score))
+    return response_text
+
+
 def process_message(message):
-    """Generates a response post based on the results of get_username() and
-    search_history(). Returns True if the message should be marked as read, and
-    thus not addressed again in the future, or False if the message could not
-    be processed but should be attempted again on the next pass.
+    """Returns True if the message should be marked as read, and thus not
+    addressed again in the future, or False if the message could not be
+    processed but should be attempted again on the next pass.
     """
-    global highest_score
-    global lowest_score
     try:
         is_pm = message.subreddit is None
         if not is_pm and message.subreddit.display_name.lower() not in opt_in_subs:
@@ -90,57 +121,41 @@ def process_message(message):
             return True
         if username.lower() == 'me':
             username = message.author.name
-        user = r.get_redditor(username)
-        try:
-            user_results = search_history(user)
-            reactionary_scores = user_results[0]
-            reactionary_comments = user_results[1]
-            reactionary_submissions = user_results[2]
-        except praw.errors.NotFound:
-            reply_with_sig(message, 'User {0} not found.'.format(username))
-            return True
-        if not is_pm:
-            for sub in reactionary_scores:
-                c.execute('UPDATE subs SET count=count+1 WHERE name=?', (sub,))
-        total_score = 0
-        if not reactionary_scores:
-            reply_with_sig(message, 'No participation in reactionary subreddits found for {0}.'.format(username))
-            return True
-        response_text = "{0}'s post history contains participation in the following reactionary subreddits:\n\n".format(user.name)
-        for subreddit in reactionary_scores:
-            total_score += reactionary_scores[subreddit]
-            num_comments = 0
-            num_submissions = 0
-            if subreddit in reactionary_comments:
-                num_comments = len(reactionary_comments[subreddit])
-            if subreddit in reactionary_submissions:
-                num_submissions = reactionary_submissions[subreddit]
-            response_text += '**{0}: {1} comment{4}, {2} submission{5}. Total score: {3}**  '.format(subreddit, num_comments,
-                             num_submissions, reactionary_scores[subreddit], '' if num_comments == 1 else 's',
-                             '' if num_submissions == 1 else 's')
-            if num_comments > 0:
-                response_text += '\nSample comment:  \n>{0}\n\n'.format(r.get_info(thing_id=random.choice(reactionary_comments[subreddit])).body.replace('\n\n', '\n\n>'))
-            else:
-                response_text += '\n\n'
-            if len(response_text) > 9900:
-                response_text = response_text[:9900] + '...'
-                break
-        response_text += '#Total Score: {0}'.format(str(total_score))
+        response_text = generate_response(username)
         reply_with_sig(message, response_text)
-        if not is_pm:
-            if total_score > highest_score:
-                highest_score = total_score
-                c.execute('REPLACE INTO users VALUES ("highest", ?, ?)', (username, total_score))
-            if total_score < lowest_score:
-                lowest_score = total_score
-                c.execute('REPLACE INTO users VALUES ("lowest", ?, ?)', (username, total_score))
         return True
     except praw.errors.HTTPException:
-        db.rollback()
         return False
     except praw.errors.APIException:
-        db.rollback()
         return False
+
+
+def process_gulag_thread(thread):
+    if thread.is_self:
+        return
+    if 'reddit.com' not in thread.url:
+        return
+    if 'reddit.com/r/' in thread.url and '/comments/' not in thread.url:
+        return
+    for comment in thread.comments:
+        if comment.author.name == bot_name:
+            return
+    url = thread.url.replace('www.np.reddit', 'www.reddit').replace('np.www.reddit', 'www.reddit').replace('np.reddit', 'www.reddit')
+    if '?context=' in url:
+        url = url[:url.index('?context=')]
+    is_comment = r'https://www\.reddit\.com/r/\w+/comments/\w+/\w+/\w+'
+    username = ''
+    if 'reddit.com/u/' in url:
+        username = url[url.index('/u/') + 3:]
+    elif 'reddit.com/user/' in url:
+        username = url[url.index('/user/') + 6:]
+    elif re.match(is_comment, url):
+        username = r.get_submission(url).comments[0].author.name
+    else:
+        username = r.get_submission(url).author.name
+    response_text = generate_response(username)
+    signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
+    thread.add_comment(response_text + signature)
 
 
 def main():
@@ -148,23 +163,17 @@ def main():
     for message in r.get_mentions(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-            c.execute('UPDATE stats SET Number=Number+1 WHERE Statistic="totalsearches"')
-            db.commit()
     for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-            db.commit()
+    for thread in r.get_subreddit('TriplanetaryTest').get_new(limit=5):
+        process_gulag_thread(thread)
 
 
 lock()
 r = praw.Reddit(user_agent=useragent, site_name='FCbot')
 r.refresh_access_information()
 bot_name = r.get_me().name
-username_regex = re.compile(r'^\s*(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name), re.IGNORECASE | re.MULTILINE)
-db = sqlite3.connect('FCbot.db')
-c = db.cursor()
-highest_score = c.execute('SELECT score FROM users WHERE distinction="highest"').fetchone()[0]
-lowest_score = c.execute('SELECT score FROM users WHERE distinction="lowest"').fetchone()[0]
 
 if __name__ == '__main__':
     main()

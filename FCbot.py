@@ -151,12 +151,12 @@ def process_gulag_thread(thread):
         username = url[url.index('/user/') + 6:]
     elif re.match(is_comment, url):
         comment = r.get_submission(url).comments[0]
-        if comment is None:
+        if comment.author is None:
             return
         username = comment.author.name
     else:
         thread = r.get_submission(url)
-        if thread is None:
+        if thread.author is None:
             return
         username = thread.author.name
     response_text = generate_response(username)

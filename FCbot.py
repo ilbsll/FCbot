@@ -47,10 +47,9 @@ def search_history(user):
 
 
 def get_username(messagetxt, is_pm):
-    """Matches the pre-compiled regex statement against the body of the
-    message. Returns one of three strings: a username, the special case 'U' if
-    the caller has used a /u/ link, or an empty string if the regex didn't
-    match.
+    """Matches the regex statement against the body of the message. Returns
+    one of three strings: a username, the special case 'U' if the caller has
+    used a /u/ link, or an empty string if the regex didn't match.
     """
     regex = r'^\s*(/?u/{0})?\s*(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'.format(bot_name)
     match = re.search(regex, messagetxt, flags=re.IGNORECASE | re.MULTILINE)
@@ -68,6 +67,19 @@ def reply_with_sig(message, response):
         message.reply(response + signature)
     elif isinstance(message, praw.objects.Submission):
         message.add_comment(response + signature)
+
+
+def get_random_comment(commentlist):
+    """Takes a list of comment IDs from a particular subreddit and returns the
+    text of a random comment whose body is not '[removed]'. If no comments are
+    eligible, returns an emtpy string.
+    """
+    randomized_comments = random.sample(commentlist)
+    for comment in randomized_comments:
+        text = r.get_info(thing_id=comment).body
+        if text != '[removed]':
+            return text.replace('\n\n', '\n\n>')
+    return ''
 
 
 def generate_response(username):
@@ -93,8 +105,9 @@ def generate_response(username):
         response_text += '**{0}: {1} comment{4}, {2} submission{5}. Total score: {3}**  '.format(subreddit, num_comments,
                          num_submissions, reactionary_scores[subreddit], '' if num_comments == 1 else 's',
                          '' if num_submissions == 1 else 's')
-        if num_comments > 0:
-            response_text += '\nSample comment:  \n>{0}\n\n'.format(r.get_info(thing_id=random.choice(reactionary_comments[subreddit])).body.replace('\n\n', '\n\n>'))
+        random_comment = get_random_comment(reactionary_comments[subreddit])
+        if random_comment:
+            response_text += '\nSample comment:  \n>{0}\n\n'.format(random_comment)
         else:
             response_text += '\n\n'
         if len(response_text) > 9900:
@@ -134,6 +147,7 @@ def process_message(message):
 
 
 def process_gulag_thread(thread):
+    """Finds users linked in /r/gulag and runs a search on them. Does not return a value."""
     if thread.is_self:
         return
     if 'reddit.com' not in thread.url:

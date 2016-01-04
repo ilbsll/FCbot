@@ -64,7 +64,10 @@ def get_username(messagetxt, is_pm):
 def reply_with_sig(message, response):
     """Appends the signature to the bot's post before posting it. Does not return a value."""
     signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
-    message.reply(response + signature)
+    if isinstance(message, praw.objects.Comment):
+        message.reply(response + signature)
+    elif isinstance(message, praw.objects.Submission):
+        message.add_comment(response + signature)
 
 
 def generate_response(username):
@@ -160,8 +163,7 @@ def process_gulag_thread(thread):
             return
         username = subm.author.name
     response_text = generate_response(username)
-    signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
-    thread.add_comment(response_text + signature)
+    reply_with_sig(thread, response_text)
 
 
 def main():

@@ -155,10 +155,10 @@ def process_gulag_thread(thread):
             return
         username = comment.author.name
     else:
-        thread = r.get_submission(url)
-        if thread.author is None:
+        subm = r.get_submission(url)
+        if subm.author is None:
             return
-        username = thread.author.name
+        username = subm.author.name
     response_text = generate_response(username)
     signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
     thread.add_comment(response_text + signature)

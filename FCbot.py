@@ -172,7 +172,7 @@ def main():
     for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-    for thread in r.get_subreddit('TriplanetaryTest').get_new(limit=5):
+    for thread in r.get_subreddit('gulag').get_new(limit=5):
         process_gulag_thread(thread)
 
 

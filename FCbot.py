@@ -63,7 +63,7 @@ def get_username(messagetxt, is_pm):
 def reply_with_sig(message, response):
     """Appends the signature to the bot's post before posting it. Does not return a value."""
     signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
-    if isinstance(message, praw.objects.Comment):
+    if isinstance(message, praw.objects.Inboxable):
         message.reply(response + signature)
     elif isinstance(message, praw.objects.Submission):
         message.add_comment(response + signature)

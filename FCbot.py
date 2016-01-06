@@ -72,9 +72,9 @@ def reply_with_sig(message, response):
 def get_random_comment(commentlist):
     """Takes a list of comment IDs from a particular subreddit and returns the
     text of a random comment whose body is not '[removed]'. If no comments are
-    eligible, returns an emtpy string.
+    eligible, returns an empty string.
     """
-    randomized_comments = random.sample(commentlist)
+    randomized_comments = random.sample(commentlist, len(commentlist))
     for comment in randomized_comments:
         text = r.get_info(thing_id=comment).body
         if text != '[removed]':

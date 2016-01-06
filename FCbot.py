@@ -111,7 +111,7 @@ def generate_response(username):
         else:
             response_text += '\n\n'
         if len(response_text) > 9900:
-            response_text = response_text[:9900] + '...'
+            response_text = response_text[:9900] + '...\n\n'
             break
     response_text += '#Total Score: {0}'.format(str(total_score))
     return response_text

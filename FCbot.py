@@ -105,7 +105,7 @@ def generate_response(username):
         response_text += '**{0}: {1} comment{4}, {2} submission{5}. Total score: {3}**  '.format(subreddit, num_comments,
                          num_submissions, reactionary_scores[subreddit], '' if num_comments == 1 else 's',
                          '' if num_submissions == 1 else 's')
-        random_comment = get_random_comment(reactionary_comments[subreddit])
+        random_comment = get_random_comment(reactionary_comments[subreddit]) if subreddit in reactionary_comments else ''
         if random_comment:
             response_text += '\nSample comment:  \n>{0}\n\n'.format(random_comment)
         else:

@@ -86,6 +86,7 @@ reactionary_subreddits = [
     'racistniggers',
     'rapingwomen',
     'shitniggerssay',
+    'shitpoliticssays',
     'shitstatistssay',
     'sjsucks',
     'sjwhate',

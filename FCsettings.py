@@ -4,6 +4,7 @@ opt_in_subs = [
     'communism',
     'fullcommunism',
     'gulag',
+    'latestagecapitalism',
     'marxistpalestine',
     'shitliberalssay',
     'socialism',

@@ -61,14 +61,12 @@ def get_username(messagetxt, is_pm):
 
 
 def reply_with_sig(message, response):
-    """Appends the signature to the bot's post before posting it. Returns the posted comment."""
+    """Appends the signature to the bot's post before posting it. Does not return a value."""
     signature = '\n\n---\n\nI am a bot. Only the last 1,000 comments and submissions are searched.'
-    comment = None
     if isinstance(message, praw.objects.Inboxable):
-        comment = message.reply(response + signature)
+        message.reply(response + signature)
     elif isinstance(message, praw.objects.Submission):
-        comment = message.add_comment(response + signature)
-    return comment
+        message.add_comment(response + signature)
 
 
 def get_random_comment(commentlist):
@@ -179,9 +177,8 @@ def process_gulag_thread(thread):
             return
         username = subm.author.name
     response_text = generate_response(username)
-    comment = reply_with_sig(thread, response_text)
-    if response_text.startswith('No participation in reactionary subreddits') and comment:
-        comment.delete()
+    if not response_text.startswith('No participation in reactionary subreddits'):
+        reply_with_sig(thread, response_text)
 
 
 def main():

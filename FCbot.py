@@ -181,6 +181,19 @@ def process_gulag_thread(thread):
         reply_with_sig(thread, response_text)
 
 
+def check_lsc_comment(comment):
+    """Checks LSC commenters and bans them if their score is too high. Does not
+    return a value, but does make me wonder if I shouldn't be breaking these
+    various roles into separate modules."""
+    user = comment.author
+    if user is None:
+        return
+    user_scores = search_history(user)[0]
+    user_total = sum([user_scores[x] for x in user_scores])
+    if user_total > 500:
+        r.get_subreddit('latestagecapitalism').add_ban(user.name)
+
+
 def main():
     """Main is usually a function."""
     for message in r.get_mentions(limit=100):
@@ -191,7 +204,8 @@ def main():
             message.mark_as_read()
     for thread in r.get_subreddit('gulag').get_new(limit=5):
         process_gulag_thread(thread)
-
+    for comment in r.get_subreddit('latestagecapitalism').get_comments(limit=5):
+        check_lsc_comment(comment)
 
 lock()
 r = praw.Reddit(user_agent=useragent, site_name='FCbot')

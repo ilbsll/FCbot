@@ -192,6 +192,7 @@ def check_lsc_comment(comment):
     user_total = sum([user_scores[x] for x in user_scores])
     if user_total > 500:
         r.get_subreddit('latestagecapitalism').add_ban(user.name)
+        comment.remove()
 
 
 def main():

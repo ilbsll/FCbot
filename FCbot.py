@@ -188,6 +188,8 @@ def check_lsc_comment(comment):
     user = comment.author
     if user is None:
         return
+    if comment.banned_by is not None:
+        return
     user_scores = search_history(user)[0]
     user_total = sum([user_scores[x] for x in user_scores])
     if user_total > 500:

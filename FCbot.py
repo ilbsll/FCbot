@@ -2,7 +2,7 @@ import fcntl
 import praw
 import random
 import re
-from FCsettings import useragent, opt_in_subs, reactionary_subreddits
+from FCsettings import useragent, opt_in_subs, reactionary_subreddits, policed_subreddits
 
 
 def lock():
@@ -181,20 +181,19 @@ def process_gulag_thread(thread):
         reply_with_sig(thread, response_text)
 
 
-def check_lsc_comment(comment):
-    """Checks LSC commenters and bans them if their score is too high. Does not
+def police_subreddit(subreddit):
+    """Checks commenters and bans them if their score is too high. Does not
     return a value, but does make me wonder if I shouldn't be breaking these
     various roles into separate modules."""
-    user = comment.author
-    if user is None:
-        return
-    if comment.banned_by is not None:
-        return
-    user_scores = search_history(user)[0]
-    user_total = sum([user_scores[x] for x in user_scores])
-    if user_total > 500:
-        r.get_subreddit('latestagecapitalism').add_ban(user.name)
-        comment.remove()
+    for comment in subreddit.get_comments(limit=5):
+        user = comment.author
+        if user is None or comment.banned_by is not None:
+            continue
+        user_scores = search_history(user)[0]
+        user_total = sum([user_scores[x] for x in user_scores])
+        if user_total > 500:
+            subreddit.add_ban(user.name)
+            comment.remove()
 
 
 def main():
@@ -207,8 +206,9 @@ def main():
             message.mark_as_read()
     for thread in r.get_subreddit('gulag').get_new(limit=5):
         process_gulag_thread(thread)
-    for comment in r.get_subreddit('latestagecapitalism').get_comments(limit=5):
-        check_lsc_comment(comment)
+    for subreddit in policed_subreddits:
+        police_subreddit(r.get_subreddit(subreddit))
+
 
 lock()
 r = praw.Reddit(user_agent=useragent, site_name='FCbot')

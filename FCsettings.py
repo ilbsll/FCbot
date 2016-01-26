@@ -112,3 +112,7 @@ reactionary_subreddits = [
     'worldstarhp',
     'wtfniggers'
 ]
+
+policed_subreddits = [
+    'latestagecapitalism'
+]

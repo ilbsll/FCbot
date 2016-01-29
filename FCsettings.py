@@ -114,5 +114,6 @@ reactionary_subreddits = [
 ]
 
 policed_subreddits = [
+    'fullcommunism',
     'latestagecapitalism'
 ]

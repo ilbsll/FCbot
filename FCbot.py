@@ -155,7 +155,7 @@ def process_gulag_thread(thread):
     if 'reddit.com/r/' in thread.url and '/comments/' not in thread.url:
         return
     for comment in thread.comments:
-        if comment.author.name == bot_name:
+        if comment.author is not None and comment.author.name == bot_name:
             return
     url = thread.url.replace('www.np.reddit', 'www.reddit').replace('np.www.reddit', 'www.reddit').replace('np.reddit', 'www.reddit')
     if '?context=' in url:

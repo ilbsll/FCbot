@@ -191,7 +191,7 @@ def police_subreddit(subreddit):
             continue
         user_scores = search_history(user)[0]
         user_total = sum([user_scores[x] for x in user_scores])
-        if user_total > 500:
+        if user_total > 1000:
             subreddit.add_ban(user.name)
             comment.remove()
 

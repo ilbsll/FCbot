@@ -25,7 +25,6 @@ reactionary_subreddits = [
     'blackcrime',
     'blackfathers',
     'blackhusbands',
-    'blackpeopletwitter',
     'capitalism',
     'chairmanpao',
     'chicongo',

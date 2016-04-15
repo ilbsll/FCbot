@@ -95,6 +95,7 @@ reactionary_subreddits = [
     'strugglefucking',
     'subredditcancer',
     'teenapers',
+    'the_donald',
     'theracistredpill',
     'theredpill',
     'tnb',

@@ -185,8 +185,17 @@ def police_subreddit(subreddit):
     """Checks commenters and bans them if their score is too high. Does not
     return a value, but does make me wonder if I shouldn't be breaking these
     various roles into separate modules."""
+    whitelist = []
+    try:
+        with open(subreddit.display_name + '_whitelist', 'r') as f:
+            whitelist = [x.strip() for x in f]
+    except FileNotFoundError:
+        with open(subreddit.display_name + '_whitelist', 'w') as f:
+            pass
     for comment in subreddit.get_comments(limit=5):
         user = comment.author
+        if user.lower() in whitelist:
+            continue
         if user is None or comment.banned_by is not None:
             continue
         user_scores = search_history(user)[0]

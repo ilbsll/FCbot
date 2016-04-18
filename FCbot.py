@@ -194,7 +194,7 @@ def police_subreddit(subreddit):
             pass
     for comment in subreddit.get_comments(limit=5):
         user = comment.author
-        if user.lower() in whitelist:
+        if user.name.lower() in whitelist:
             continue
         if user is None or comment.banned_by is not None:
             continue

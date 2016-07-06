@@ -146,41 +146,6 @@ def process_message(message):
         return False
 
 
-def process_gulag_thread(thread):
-    """Finds users linked in /r/gulag and runs a search on them. Does not return a value."""
-    if thread.is_self:
-        return
-    if 'reddit.com' not in thread.url:
-        return
-    if 'reddit.com/r/' in thread.url and '/comments/' not in thread.url:
-        return
-    for comment in thread.comments:
-        if comment.author is not None and comment.author.name == bot_name:
-            return
-    url = thread.url.replace('www.np.reddit', 'www.reddit').replace('np.www.reddit', 'www.reddit').replace('np.reddit', 'www.reddit')
-    if '?context=' in url:
-        url = url[:url.index('?context=')]
-    is_comment = r'https://www\.reddit\.com/r/\w+/comments/\w+/\w+/\w+'
-    username = ''
-    if 'reddit.com/u/' in url:
-        username = url[url.index('/u/') + 3:]
-    elif 'reddit.com/user/' in url:
-        username = url[url.index('/user/') + 6:]
-    elif re.match(is_comment, url):
-        comment = r.get_submission(url).comments[0]
-        if comment.author is None:
-            return
-        username = comment.author.name
-    else:
-        subm = r.get_submission(url)
-        if subm.author is None:
-            return
-        username = subm.author.name
-    response_text = generate_response(username)
-    if not response_text.startswith('No participation in reactionary subreddits'):
-        reply_with_sig(thread, response_text)
-
-
 def police_subreddit(subreddit):
     """Checks commenters and bans them if their score is too high. Does not
     return a value, but does make me wonder if I shouldn't be breaking these
@@ -213,8 +178,6 @@ def main():
     for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-    for thread in r.get_subreddit('gulag').get_new(limit=5):
-        process_gulag_thread(thread)
     for subreddit in policed_subreddits:
         police_subreddit(r.get_subreddit(subreddit))
 

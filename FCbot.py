@@ -2,7 +2,7 @@ import fcntl
 import praw
 import random
 import re
-from FCsettings import useragent, opt_in_subs, reactionary_subreddits, policed_subreddits
+from FCsettings import useragent, opt_in_subs, reactionary_subreddits, patrolled_subreddits
 
 
 def lock():
@@ -146,7 +146,7 @@ def process_message(message):
         return False
 
 
-def police_subreddit(subreddit):
+def patrol_subreddit(subreddit):
     """Checks commenters and bans them if their score is too high. Does not
     return a value, but does make me wonder if I shouldn't be breaking these
     various roles into separate modules."""
@@ -180,8 +180,8 @@ def main():
     for message in r.get_messages(limit=100):
         if message.new and process_message(message):
             message.mark_as_read()
-    for subreddit in policed_subreddits:
-        police_subreddit(r.get_subreddit(subreddit))
+    for subreddit in patrolled_subreddits:
+        patrol_subreddit(r.get_subreddit(subreddit))
 
 
 lock()

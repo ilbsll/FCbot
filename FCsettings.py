@@ -113,6 +113,6 @@ reactionary_subreddits = [
     'wtfniggers'
 ]
 
-policed_subreddits = [
+patrolled_subreddits = [
     'latestagecapitalism'
 ]

@@ -12,7 +12,7 @@ opt_in_subs = [
 ]
 
 reactionary_subreddits = [
-    '4chan',
+#   '4chan',
     '8chan',
     'anarcho_capitalism',
     'antipozi',

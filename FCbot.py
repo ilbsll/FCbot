@@ -152,10 +152,10 @@ def police_subreddit(subreddit):
     various roles into separate modules."""
     whitelist = []
     try:
-        with open(subreddit.display_name + '_whitelist', 'r') as f:
+        with open(subreddit.display_name.lower() + '_whitelist', 'r') as f:
             whitelist = [x.strip() for x in f]
     except FileNotFoundError:
-        with open(subreddit.display_name + '_whitelist', 'w') as f:
+        with open(subreddit.display_name.lower() + '_whitelist', 'w') as f:
             pass
     posts = list(subreddit.get_comments(limit=5))
     posts += list(subreddit.get_new(limit=5))

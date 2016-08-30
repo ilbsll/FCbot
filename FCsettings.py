@@ -1,4 +1,4 @@
-useragent = 'FULLCOMMUNISM reactionary sub peeksy-pie agent v2'
+useragent = 'FULLCOMMUNISM reactionary sub peeksy-pie agent v3'
 
 opt_in_subs = [
     'communism',

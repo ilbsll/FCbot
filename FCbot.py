@@ -117,12 +117,34 @@ def generate_response(username):
     return response_text
 
 
+def process_mod_command(message):
+    regex = r'^\s*!(?P<subname>\w+)\s+(?P<command>\w+)\s+(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'
+    match = re.search(regex, message.body, flags=re.IGNORECASE | re.MULTILINE)
+    if not match:
+        return
+    sub_name = match.group('subname')
+    if sub_name.lower() not in patrolled_subreddits:
+        return
+    subreddit = r.get_subreddit(sub_name)
+    if message.author not in subreddit.get_moderators():
+        return
+    if match.group('command').lower() == 'whitelist':
+        with open(subreddit.display_name.lower() + '_whitelist', 'a') as f:
+            f.write(match.group('username') + '\n')
+        r.send_message(message.author,
+                       'User added to whitelist', 'User {0} has been added to the ban whitelist for the subreddit {1}.'
+                       .format(match.group('username'), subreddit.display_name))
+
+
 def process_message(message):
     """Returns True if the message should be marked as read, and thus not
     addressed again in the future, or False if the message could not be
     processed but should be attempted again on the next pass.
     """
     try:
+        if message.body.startswith('!'):
+            process_mod_command(message)
+            return True
         is_pm = message.subreddit is None
         if not is_pm and message.subreddit.display_name.lower() not in opt_in_subs:
             return True

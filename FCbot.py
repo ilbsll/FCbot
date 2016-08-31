@@ -130,7 +130,7 @@ def process_mod_command(message):
         return
     if match.group('command').lower() == 'whitelist':
         with open(subreddit.display_name.lower() + '_whitelist', 'a') as f:
-            f.write(match.group('username') + '\n')
+            f.write(match.group('username').lower() + '\n')
         r.send_message(message.author,
                        'User added to whitelist', 'User {0} has been added to the ban whitelist for the subreddit {1}.'
                        .format(match.group('username'), subreddit.display_name))

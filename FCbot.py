@@ -190,7 +190,11 @@ def patrol_subreddit(subreddit):
         user_scores = search_history(user)[0]
         user_total = sum([user_scores[x] for x in user_scores])
         if user_total > 1000:
-            subreddit.add_ban(user.name)
+            subs = ', '.join(user_scores)
+            ban_message = 'You have been automatically banned for participation in the following reactionary ' \
+                          'subreddits: ' + subs
+            params = {'ban_reason': 'Reactionary subreddits', 'note': subs, 'ban_message': ban_message}
+            subreddit.add_ban(user.name, **params)
             post.remove()
 
 

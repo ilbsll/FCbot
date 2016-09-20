@@ -142,7 +142,7 @@ def process_message(message):
     processed but should be attempted again on the next pass.
     """
     try:
-        if message.body.startswith('!'):
+        if message.body.lstrip().startswith('!'):
             process_mod_command(message)
             return True
         is_pm = message.subreddit is None
@@ -162,9 +162,7 @@ def process_message(message):
         response_text = generate_response(username)
         reply_with_sig(message, response_text)
         return True
-    except praw.errors.HTTPException:
-        return False
-    except praw.errors.APIException:
+    except (praw.errors.HTTPException, praw.errors.APIException):
         return False
 
 

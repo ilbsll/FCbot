@@ -117,6 +117,11 @@ def generate_response(username):
     return response_text
 
 
+def whitelist_user(subname, username):
+    with open(subname.lower() + '_whitelist', 'a') as f:
+        f.write(username.lower() + '\n')
+
+
 def process_mod_command(message):
     regex = r'^\s*!(?P<subname>\w+)\s+(?P<command>\w+)\s+(?P<ulink>/?u/)?\\?(?P<username>[-\w]+)\s*$'
     match = re.search(regex, message.body, flags=re.IGNORECASE | re.MULTILINE)
@@ -129,10 +134,16 @@ def process_mod_command(message):
     if message.author not in subreddit.get_moderators():
         return
     if match.group('command').lower() == 'whitelist':
-        with open(subreddit.display_name.lower() + '_whitelist', 'a') as f:
-            f.write(match.group('username').lower() + '\n')
+        whitelist_user(subreddit.display_name, match.group('username'))
         r.send_message(message.author,
                        'User added to whitelist', 'User {0} has been added to the ban whitelist for the subreddit {1}.'
+                       .format(match.group('username'), subreddit.display_name))
+    if match.group('command').lower() == 'unban':
+        whitelist_user(subreddit.display_name, match.group('username'))
+        subreddit.remove_ban(match.group('username'))
+        r.send_message(message.author,
+                       'User unbanned',
+                       'User {0} has been added to the ban whitelist for the subreddit {1} and unbanned.'
                        .format(match.group('username'), subreddit.display_name))
 
 

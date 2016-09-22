@@ -136,7 +136,8 @@ def process_mod_command(message):
     if match.group('command').lower() == 'whitelist':
         whitelist_user(subreddit.display_name, match.group('username'))
         r.send_message(message.author,
-                       'User added to whitelist', 'User {0} has been added to the ban whitelist for the subreddit {1}.'
+                       'User added to whitelist',
+                       'User {0} has been added to the ban whitelist for the subreddit {1}.'
                        .format(match.group('username'), subreddit.display_name))
     if match.group('command').lower() == 'unban':
         whitelist_user(subreddit.display_name, match.group('username'))
@@ -192,9 +193,7 @@ def patrol_subreddit(subreddit):
     posts += list(subreddit.get_new(limit=5))
     for post in posts:
         user = post.author
-        if user.name.lower() in whitelist:
-            continue
-        if user is None or post.banned_by is not None:
+        if user is None or post.banned_by is not None or user.name.lower() in whitelist:
             continue
         user_scores = search_history(user)[0]
         user_total = sum([user_scores[x] for x in user_scores])

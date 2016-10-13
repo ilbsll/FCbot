@@ -14,6 +14,7 @@ opt_in_subs = [
 reactionary_subreddits = [
 #   '4chan',
     '8chan',
+    'altright',
     'anarcho_capitalism',
     'antipozi',
     'apefrica',
